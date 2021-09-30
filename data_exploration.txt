@@ -1,0 +1,206 @@
+-- SETTING UP TABLES
+
+
+-- CREATE TABLE covidvaccinations(
+-- 	iso_code	varchar(50),
+-- 	continent	varchar(50),
+-- 	"location"	varchar(50),
+-- 	"date"	date,
+-- 	new_tests	double precision,
+-- 	total_tests	double precision,
+-- 	total_tests_per_thousand	double precision,
+-- 	new_tests_per_thousand	double precision,
+-- 	new_tests_smoothed	double precision,
+-- 	new_tests_smoothed_per_thousand	double precision,
+-- 	positive_rate	double precision,
+-- 	tests_per_case	double precision,
+-- 	tests_units	double precision,
+-- 	total_vaccinations	double precision,
+-- 	people_vaccinated	double precision,
+-- 	people_fully_vaccinated	double precision,
+-- 	total_boosters	double precision,
+-- 	new_vaccinations	double precision,
+-- 	new_vaccinations_smoothed	double precision,
+-- 	total_vaccinations_per_hundred	double precision,
+-- 	people_vaccinated_per_hundred	double precision,
+-- 	people_fully_vaccinated_per_hundred	double precision,
+-- 	total_boosters_per_hundred	double precision,
+-- 	new_vaccinations_smoothed_per_million	double precision,
+-- 	stringency_index	double precision,
+-- 	population	double precision,
+-- 	population_density	double precision,
+-- 	median_age	double precision,
+-- 	aged_65_older	double precision,
+-- 	aged_70_older	double precision,
+-- 	gdp_per_capita	double precision,
+-- 	extreme_poverty	double precision,
+-- 	cardiovasc_death_rate	double precision,
+-- 	diabetes_prevalence	double precision,
+-- 	female_smokers	double precision,
+-- 	male_smokers	double precision,
+-- 	handwashing_facilities	double precision,
+-- 	hospital_beds_per_thousand	double precision,
+-- 	life_expectancy	double precision,
+-- 	human_development_index	double precision,
+-- 	excess_mortality_cumulative_absolute double precision,
+-- 	excess_mortality_cumulative	double precision,
+-- 	excess_mortality	double precision,
+-- 	excess_mortality_cumulative_per_million	double precision,
+-- 	primary key (iso_code)
+-- 	);
+
+
+-- CREATE TABLE coviddeaths(
+-- 	iso_code varchar(60),
+-- 	continent varchar(60),
+-- 	"location" varchar(60),
+-- 	"date" date,
+-- 	population double precision,
+-- 	total_cases double precision,
+-- 	new_cases double precision,
+-- 	new_cases_smoothed double precision,
+-- 	total_deaths double precision,
+-- 	new_deaths double precision,
+-- 	new_deaths_smoothed double precision,
+-- 	total_cases_per_million double precision,
+-- 	new_cases_per_million double precision,
+-- 	new_cases_smoothed_per_million double precision,
+-- 	total_deaths_per_million double precision,
+-- 	new_deaths_per_million double precision,
+-- 	new_deaths_smoothed_per_million double precision,
+-- 	reproduction_rate double precision,
+-- 	icu_patients double precision,
+-- 	icu_patients_per_million double precision,
+-- 	hosp_patients double precision,
+-- 	hosp_patients_per_million double precision,
+-- 	weekly_icu_admissions double precision,
+-- 	weekly_icu_admissions_per_million double precision,
+-- 	weekly_hosp_admissions double precision,
+-- 	weekly_hosp_admissions_per_million double precision,
+-- 	primary key (iso_code)
+-- 	)
+
+-- COPY covidvaccinations(iso_code,continent,location,date,new_tests,total_tests,total_tests_per_thousand,new_tests_per_thousand,new_tests_smoothed,new_tests_smoothed_per_thousand,positive_rate,tests_per_case,tests_units,total_vaccinations,people_vaccinated,people_fully_vaccinated,total_boosters,new_vaccinations,new_vaccinations_smoothed,total_vaccinations_per_hundred,people_vaccinated_per_hundred,people_fully_vaccinated_per_hundred,total_boosters_per_hundred,new_vaccinations_smoothed_per_million,stringency_index,population,population_density,median_age,aged_65_older,aged_70_older,gdp_per_capita,extreme_poverty,cardiovasc_death_rate,diabetes_prevalence,female_smokers,male_smokers,handwashing_facilities,hospital_beds_per_thousand,life_expectancy,human_development_index,excess_mortality_cumulative_absolute,excess_mortality_cumulative,excess_mortality,excess_mortality_cumulative_per_million)
+-- FROM 'C:\Users\devan\OneDrive\Desktop\SQL Project\CovidVaccinations.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+
+
+
+-- VERIFYING TABLE IMPORT
+
+-- select * from coviddeaths
+-- order by 3,4;
+
+-- select * from covidvaccinations
+-- order by 3,4;
+
+
+
+
+-- BASIC DATA REVIEW
+
+-- Selecting data to be used:
+-- select location, date, total_cases, new_cases, total_deaths, population
+-- from coviddeaths
+-- order by 1,2
+
+
+-- Looking at total cases vs total deaths
+-- shows likelihood of dying if contracting COVID per country
+-- select location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as death_percentage
+-- from coviddeaths
+-- order by 1,2
+
+
+-- Looking at total cases vs. population
+-- shows what percentage of population got COVID
+-- select location, date, total_cases, population, (total_cases/population)*100 as percent_population_infected
+-- from coviddeaths
+-- where location like '%States%'
+-- order by 1,2
+
+
+-- Looking at countries with highest infection rate compared to populuation
+-- select location, population, MAX(total_cases) as highest_infection_count, MAX((total_cases/population))*100 as percent_population_infected
+-- from coviddeaths
+-- group by location, population
+-- order by percent_population_infected desc
+
+
+-- Looking at countries with highest death rate compared to population
+-- select location, MAX(total_deaths) as total_death_count
+-- from coviddeaths
+-- where continent is not null
+-- group by location
+-- order by total_death_count desc
+
+
+-- BREAKING DOWN BY CONTINENT
+-- select continent, MAX(total_deaths) as total_death_count
+-- from coviddeaths
+-- where continent is not null
+-- group by continent
+-- order by total_death_count desc
+
+
+-- GLOBAL NUMBERS
+-- complete total death percentage
+-- select SUM(new_cases) as total_new_cases, SUM(new_deaths) as total_new_deaths, SUM(new_deaths)/SUM(new_cases)*100 as death_percentage
+-- from coviddeaths
+-- where continent is not null
+-- order by 1,2
+
+-- Joining coviddeaths and covidvaccinations tables
+--  select *
+--  from coviddeaths dea
+--  join covidvaccinations vac
+--  on dea.location = vac.location
+--  and dea.date = vac.date
+
+
+
+
+-- INTERMEDIATE DATA REVIEW
+
+-- Looking at Total Population vs. Vaccinations
+
+-- select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
+-- SUM(vac.new_vaccinations) OVER(Partition by dea.location order by dea.location, dea.date) as rolling_people_vaccinated,
+-- from coviddeaths dea
+-- join covidvaccinations vac
+-- on dea.location = vac.location
+-- and dea.date = vac.date
+-- where dea.continent is not null
+-- order by 2,3
+
+
+-- Using CTE to perform Calculation on Partition By in previous query
+
+-- With PopvsVac (Continent, Location, Date, Population, New_Vaccinations, rolling_people_vaccinated)
+-- as
+-- (
+-- Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+-- , SUM(vac.new_vaccinations) OVER (Partition by dea.Location Order by dea.location, dea.Date) as rolling_people_vaccinated
+-- From coviddeaths dea
+-- Join covidvaccinations vac
+-- 	On dea.location = vac.location
+-- 	and dea.date = vac.date
+-- where dea.continent is not null 
+-- )
+-- Select *, (rolling_people_vaccinated/Population)*100 as percect_pop_vaccinated
+-- From PopvsVac
+
+
+-- Creating a view to store data for visualizations
+
+create view percent_pop_vaccinated as
+Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(vac.new_vaccinations) OVER (Partition by dea.Location Order by dea.location, dea.Date) as rolling_people_vaccinated
+From coviddeaths dea
+Join covidvaccinations vac
+	On dea.location = vac.location
+	and dea.date = vac.date
+where dea.continent is not null
+
