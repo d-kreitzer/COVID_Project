@@ -1,3 +1,8 @@
+Questions to be answered: 
+  1. How many contracted cases of COVID-19 have resulted in deaths? 
+  2. Which countries/regions have been most impacted by COVID-19?
+
+
 -- 1. 
 
 Select SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(New_Cases)*100 as DeathPercentage
